@@ -1,0 +1,15 @@
+{
+  "appId": "com.aksustudio.critterescape",
+  "appName": "Critter Escape",
+  "webDir": "www",
+  "backgroundColor": "#000000",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "launchAutoHide": true,
+      "backgroundColor": "#000000",
+      "showSpinner": false
+    }
+  }
+}
