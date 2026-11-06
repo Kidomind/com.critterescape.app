@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Critter Escape",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Critter Escape",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": " com.critterescape.app",
+  "description": "A fun and exciting escape game where you help the critter get away!"
+}
