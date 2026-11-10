@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Critter Escape</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e1233">
 <style>
 :root{--bg:linear-gradient(180deg,#0e1233,#122048 60%,#0f2c48);--fg:#fff;--card:rgba(255,255,255,.12);--btn:#ff6b8b;--btnfg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0;background:var(--bg) fixed;color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -1060,5 +1062,6 @@ requestAnimationFrame(hloop);
 setInterval(tick,TICK);
 start();over=true;requestAnimationFrame(draw);
 </script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
 </body>
 </html>
