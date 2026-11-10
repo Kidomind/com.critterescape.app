@@ -113,8 +113,8 @@ button:active{transform:scale(.9)}
 .s{display:none}
 
 /* ===== AD AREAS ===== */
-:root{--adh:50px}
-#ad-banner{flex:none;width:100%;max-width:468px;height:var(--adh);border-radius:10px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.65);font-size:12px;font-weight:700;letter-spacing:.4px;box-sizing:border-box}
+:root{--adh:0px}
+#ad-banner{flex:none;width:100%;max-width:468px;height:var(--adh);border-radius:10px;overflow:hidden;position:relative;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.65);font-size:12px;font-weight:700;letter-spacing:.4px;box-sizing:border-box}
 #ad-banner small{position:absolute;top:2px;left:6px;font-size:9px;opacity:.6}
 #home{bottom:calc(var(--adh) + 12px + var(--sab))}
 #ad{z-index:70;background:rgba(5,8,30,.96);flex-direction:column;gap:14px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility 0s .25s}
@@ -533,6 +533,7 @@ function toast(t){$('m').textContent=t;clearTimeout(toastT);toastT=setTimeout(()
 const Ads=(()=>{
   const cap=window.Capacitor,nat=!!(cap&&cap.isNativePlatform&&cap.isNativePlatform()),P=nat?((cap.Plugins&&cap.Plugins.AdMob)||(cap.registerPlugin&&cap.registerPlugin('AdMob'))):null;
   const native=!!(cap&&cap.isNativePlatform&&cap.isNativePlatform()&&P);
+  if(native)document.documentElement.style.setProperty('--adh','50px'); // reserve space only for the real native banner
   const id=k=>ADS.testMode?ADS[k].test:ADS[k].live;
   let last=Date.now(),cbI=null,cbR=null,gotReward=false,rdy={i:false,r:false};
   const pre=()=>{stopMusic();};
