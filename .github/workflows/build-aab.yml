@@ -4,13 +4,30 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # AdMob App ID: GitHub > Settings > Secrets and variables > Actions > Variables > ADMOB_APP_ID
+      # Tanimli degilse Google'in TEST App ID'si kullanilir.
+      ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check signing secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!v}" ]; then echo "::error::Secret $v eksik (Settings > Secrets and variables > Actions)"; exit 1; fi
+          done
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
@@ -36,16 +53,40 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Configure AndroidManifest (AdMob App ID + portrait)
+        run: |
+          python3 - <<'PY'
+          import os
+          p = 'android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          assert 'com.google.android.gms.ads.APPLICATION_ID' not in s
+          meta = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="%s"/>' % os.environ['ADMOB_APP_ID']
+          assert '</application>' in s and '<activity ' in s
+          s = s.replace('</application>', '    ' + meta + '\n    </application>', 1)
+          s = s.replace('<activity ', '<activity android:screenOrientation="portrait" ', 1)
+          open(p, 'w', encoding='utf-8').write(s)
+          PY
+          cat android/app/src/main/AndroidManifest.xml
+
       - name: Generate icons and splash screens
         run: npx capacitor-assets generate --android
 
       - name: Sync web files
         run: npx cap sync android
 
+      - name: Check target SDK is 36
+        run: |
+          grep -n "SdkVersion" android/variables.gradle
+          grep -Eq "targetSdkVersion *=? *36" android/variables.gradle || { echo "::error::targetSdkVersion 36 degil, Google Play kabul etmez"; exit 1; }
+
       - name: Set version code
         run: |
-          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -E -i "s/versionCode[ =]+[0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
           grep -n "versionCode" android/app/build.gradle
+          grep -q "versionCode ${{ github.run_number }}" android/app/build.gradle
+
+      - name: Setup Gradle (cache)
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build release AAB
         working-directory: android
@@ -75,3 +116,4 @@ jobs:
         with:
           name: critter-escape-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
