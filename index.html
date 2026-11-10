@@ -63,9 +63,9 @@ button:active{transform:scale(.9)}
 #home .hint{font-size:13px;opacity:.65;text-align:center;max-width:260px}
 
 .bar{padding:8px 10px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.12);flex:none}
-#lv{display:flex;flex-direction:column;line-height:1.15}#lv b{font-size:15px}#lv small{font-size:12px;opacity:.65;font-weight:600}
-#hp{font-size:17px;letter-spacing:1px;display:inline-block;flex:1;text-align:center}
-.bar .tools{display:flex;gap:7px}
+#lv{display:flex;flex-direction:column;line-height:1.15;white-space:nowrap;flex:none}#lv b{font-size:15px}#lv small{font-size:12px;opacity:.65;font-weight:600}
+#hp{font-size:16px;letter-spacing:0;display:inline-block;flex:1;min-width:0;text-align:center;white-space:nowrap}
+.bar .tools{display:flex;gap:7px;flex:none}
 .bar .tools button{position:relative;width:42px;height:42px;padding:0;font-size:19px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(160deg,#ff8fa8,#ff5277);box-shadow:0 3px 0 #c93a5c,0 6px 10px rgba(255,82,119,.3);transition:transform .12s,box-shadow .12s,opacity .2s}
 .bar .tools button:active{transform:translateY(3px);box-shadow:0 0 0 #c93a5c}
 #ht b{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:10px;background:#ffd23f;color:#5a3b00;font-size:12px;line-height:19px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.25)}
@@ -166,6 +166,20 @@ button:active{transform:scale(.9)}
 .sp-bar{bottom:calc(var(--sab) + 44px);height:3px;border-radius:99px;background:#ffffff22}
 .sp-bar i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px 2px #ffffffaa}
 @media(prefers-reduced-motion:reduce){#splash:before,#splash:after,.sp-name b i,.sp-name span i,.sp-line{animation:none}.sp-line{width:min(64vw,240px)}}
+
+/* ===== HOME v2: deep teal + ember amber ===== */
+#home{background:radial-gradient(120% 60% at 50% 105%,rgba(255,150,40,.28),rgba(255,150,40,0) 65%),radial-gradient(90% 50% at 50% -5%,rgba(60,220,190,.18),rgba(60,220,190,0) 70%),linear-gradient(180deg,#06161b,#0a2a31 55%,#07181d)}
+#home h1{font-size:42px;font-weight:800;letter-spacing:.02em;color:#f2fffb;text-shadow:0 2px 24px rgba(60,220,190,.35)}
+#home h1 span{animation:none;color:#f2fffb}
+#home .sub{color:#8fd8c9;font-weight:600;font-size:15px;letter-spacing:0}
+#home .bot{width:min(340px,100%);padding:18px 16px 14px;gap:14px;border-radius:28px;background:rgba(10,42,49,.82);border:1px solid rgba(143,216,201,.22);box-shadow:0 12px 28px rgba(0,0,0,.3)}
+#home .lvl{background:transparent;border:0;padding:0;color:#8fd8c9;font-size:14px;font-weight:700}
+#home #play{width:100%;font-size:20px;font-weight:800;padding:16px 24px;border-radius:18px;color:#2b1600;background:linear-gradient(180deg,#ffcb4a,#ff9a1f);box-shadow:0 10px 26px rgba(255,150,40,.38),inset 0 1px 0 rgba(255,255,255,.55);animation:none;border:0;position:relative;overflow:hidden}
+#home #play:active{transform:scale(.97)}
+#play::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent)}
+#home .row{gap:8px;width:100%}
+#home .row button{flex:1;font-size:13px;font-weight:700;padding:10px 8px;border-radius:14px;background:rgba(143,216,201,.1);border:1px solid rgba(143,216,201,.25);color:#d9fff5}
+#home .hint{font-size:12px;opacity:.7;color:#b7e6dc;max-width:none}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;800&display=swap" media="print" onload="this.media='all'">
@@ -1056,7 +1070,7 @@ function onRz(){
   rzT=setTimeout(()=>{
     const w=$('w');if(w.clientWidth===S&&w.clientHeight===H)return;
     if(!$('home').classList.contains('off')){calcNR();if(GC.nr!==NR){GC={nr:NR,m:{}};GP={};}size();prefetch();return;}
-    if(arms.every(a=>a.st==='idle')&&hearts===3)start();else size();
+    const oldNR=NR;calcNR();if(NR!==oldNR&&arms.every(a=>a.st==='idle')&&hearts===3){start();return;}NR=oldNR;size();
   },150);
 }
 if(window.ResizeObserver)new ResizeObserver(onRz).observe($('w'));else addEventListener('resize',onRz);
@@ -1129,9 +1143,9 @@ function buildInk(){
   const y1=A>60?topY+(A-h*2.9)/2+h/2:HH*.33,y2=y1+h*1.55,yu=y2+h*.78,w2=textW('STUDIO',h);
   const under=[];for(let i=0;i<=24;i++){const f=i/24;under.push([cx-w2/2+w2*f,yu+Math.sin(f*Math.PI*3)*h*.07]);}
   hPaths=[
-    mkPath(textStrokes('AKSU',cx,y1,h),[-m,y1-h*.2],[HW+m,y1-h*.9],hero,0,'#ff4d8d'),
-    mkPath(textStrokes('STUDIO',cx,y2,h),[-m,y2+h*.2],[HW+m,y2-h*.6],ex1,.7,'#2ec4b6'),
-    mkPath([under],[-m,yu+h*.6],[HW+m,yu-h*.6],ex2,1.6,'#9ef01a')
+    mkPath(textStrokes('AKSU',cx,y1,h),[-m,y1-h*.2],[HW+m,y1-h*.9],hero,0,'#ffb84d'),
+    mkPath(textStrokes('STUDIO',cx,y2,h),[-m,y2+h*.2],[HW+m,y2-h*.6],ex1,.7,'#4fe3c1'),
+    mkPath([under],[-m,yu+h*.6],[HW+m,yu-h*.6],ex2,1.6,'#ff7a59')
   ];
   let done=0;for(const p of hPaths)done=Math.max(done,p.d+(p.L+hCs*.45*14)/hSpd);
   hCycle=done+3+1.4;hHold=done+3;
