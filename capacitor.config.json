@@ -1,5 +1,5 @@
 {
-"appId": "com.critterescape.app",
+  "appId": "com.critterescape.app",
   "appName": "Critter Escape",
   "webDir": "www",
   "backgroundColor": "#000000",
