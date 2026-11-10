@@ -7,9 +7,9 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0e1233">
 <style>
-:root{--bg:linear-gradient(180deg,#0e1233,#122048 60%,#0f2c48);--fg:#fff;--card:rgba(255,255,255,.12);--btn:#ff6b8b;--btnfg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--sat:var(--safe-area-inset-top,env(safe-area-inset-top,0px));--sab:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));--bg:linear-gradient(180deg,#0e1233,#122048 60%,#0f2c48);--fg:#fff;--card:rgba(255,255,255,.12);--btn:#ff6b8b;--btnfg:#fff;box-sizing:border-box;padding-top:var(--sat);padding-bottom:var(--sab)}
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-body{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;box-sizing:border-box;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:hidden}
+body{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;box-sizing:border-box;height:calc(100dvh - var(--sat) - var(--sab));overflow:hidden}
 #w{flex:1;min-height:0;width:100%;position:relative}
 #w canvas{position:absolute;left:0;top:0;display:block}
 h1{display:none}
@@ -19,7 +19,7 @@ h1 span{display:inline-block;animation:fl 2.4s ease-in-out infinite}
 canvas{border-radius:18px;touch-action:none;box-shadow:0 0 0 2px rgba(255,255,255,.14)}
 button{background:var(--btn);color:var(--btnfg);border:0;border-radius:12px;padding:8px 12px;font-size:14px;font-weight:700;transition:transform .1s}
 button:active{transform:scale(.9)}
-#m{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + var(--adh) + 28px);transform:translateX(-50%);z-index:20;pointer-events:none;white-space:nowrap;text-align:center;font-weight:800;font-size:17px;color:#fff;background:rgba(10,14,50,.92);border:1px solid rgba(255,255,255,.25);padding:10px 20px;border-radius:22px;animation:toast .45s cubic-bezier(.2,1.6,.4,1)}
+#m{position:fixed;left:50%;bottom:calc(var(--sab) + var(--adh) + 28px);transform:translateX(-50%);z-index:20;pointer-events:none;white-space:nowrap;text-align:center;font-weight:800;font-size:17px;color:#fff;background:rgba(10,14,50,.92);border:1px solid rgba(255,255,255,.25);padding:10px 20px;border-radius:22px;animation:toast .45s cubic-bezier(.2,1.6,.4,1)}
 #m:empty{display:none}
 @keyframes toast{from{transform:translateX(-50%) translateY(30px) scale(.7);opacity:0}}
 #m button{font-size:16px;padding:10px 18px;animation:bn .6s ease-in-out infinite alternate}
@@ -97,7 +97,7 @@ button:active{transform:scale(.9)}
 .ic.flash{animation:fls .6s ease-out}@keyframes fls{30%{transform:scale(1.5);filter:drop-shadow(0 0 10px #fff)}}
 #ht b.bump{animation:bmp .5s cubic-bezier(.2,1.8,.4,1)}@keyframes bmp{30%{transform:scale(1.8)}}
 
-#home{justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 9vh) 20px calc(env(safe-area-inset-bottom,0px) + 4vh);gap:6px}
+#home{justify-content:flex-start;padding:calc(var(--sat) + 9vh) 20px calc(var(--sab) + 4vh);gap:6px}
 #hc{position:absolute;inset:0;width:100%;height:100%;z-index:0;border-radius:0;box-shadow:none}
 #home h1,#home .sub,#home .bot{position:relative;z-index:1}
 #home h1{animation:ttlIn .8s cubic-bezier(.2,1.4,.4,1) both;text-shadow:0 4px 0 rgba(0,0,0,.35),0 6px 18px rgba(255,120,60,.45)}
@@ -116,7 +116,7 @@ button:active{transform:scale(.9)}
 :root{--adh:50px}
 #ad-banner{flex:none;width:100%;max-width:468px;height:var(--adh);border-radius:10px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.65);font-size:12px;font-weight:700;letter-spacing:.4px;box-sizing:border-box}
 #ad-banner small{position:absolute;top:2px;left:6px;font-size:9px;opacity:.6}
-#home{bottom:calc(var(--adh) + 12px + env(safe-area-inset-bottom,0px))}
+#home{bottom:calc(var(--adh) + 12px + var(--sab))}
 #ad{z-index:70;background:rgba(5,8,30,.96);flex-direction:column;gap:14px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility 0s .25s}
 #ad.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s}
 #ad .tag{font-size:12px;font-weight:800;letter-spacing:1px;opacity:.7}
@@ -159,9 +159,9 @@ button:active{transform:scale(.9)}
 .sp-name span i{animation:spFade .8s ease both;animation-delay:calc(1.1s + var(--i)*.08s)}
 @keyframes spFade{from{opacity:0;filter:blur(8px);transform:translateY(6px)}}
 .sp-meta,.sp-bar{position:absolute;z-index:1;left:50%;transform:translateX(-50%);width:min(68%,260px)}
-.sp-meta{bottom:calc(env(safe-area-inset-bottom,0px) + 62px);display:flex;justify-content:space-between;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:#ffffff99}
+.sp-meta{bottom:calc(var(--sab) + 62px);display:flex;justify-content:space-between;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:#ffffff99}
 .sp-pct{color:#fff;font-variant-numeric:tabular-nums}
-.sp-bar{bottom:calc(env(safe-area-inset-bottom,0px) + 44px);height:3px;border-radius:99px;background:#ffffff22}
+.sp-bar{bottom:calc(var(--sab) + 44px);height:3px;border-radius:99px;background:#ffffff22}
 .sp-bar i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px 2px #ffffffaa}
 @media(prefers-reduced-motion:reduce){#splash:before,#splash:after,.sp-name b i,.sp-name span i,.sp-line{animation:none}.sp-line{width:min(64vw,240px)}}
 </style>
@@ -531,7 +531,7 @@ const ADS={
 let adCb=null,adT=null,overN=0,revUsed=false,toastT=0;
 function toast(t){$('m').textContent=t;clearTimeout(toastT);toastT=setTimeout(()=>{if($('m').textContent===t)$('m').textContent='';},2200);}
 const Ads=(()=>{
-  const cap=window.Capacitor,P=cap&&cap.Plugins&&cap.Plugins.AdMob;
+  const cap=window.Capacitor,nat=!!(cap&&cap.isNativePlatform&&cap.isNativePlatform()),P=nat?((cap.Plugins&&cap.Plugins.AdMob)||(cap.registerPlugin&&cap.registerPlugin('AdMob'))):null;
   const native=!!(cap&&cap.isNativePlatform&&cap.isNativePlatform()&&P);
   const id=k=>ADS.testMode?ADS[k].test:ADS[k].live;
   let last=Date.now(),cbI=null,cbR=null,gotReward=false,rdy={i:false,r:false};
@@ -1194,6 +1194,6 @@ function loop(now){
 setInterval(tick,TICK);
 initGen();start();over=true;requestAnimationFrame(loop);Ads.init();
 </script>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
+<script>if('serviceWorker' in navigator&&!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())){navigator.serviceWorker.register('sw.js')}</script>
 </body>
 </html>
