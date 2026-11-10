@@ -1,136 +1,21 @@
-name: Build signed AAB
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    env:
-      # AdMob App ID: GitHub > Settings > Secrets and variables > Actions > Variables > ADMOB_APP_ID
-      # Tanimli degilse Google'in TEST App ID'si kullanilir.
-      ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Check signing secrets
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          for v in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
-            if [ -z "${!v}" ]; then echo "::error::Secret $v eksik (Settings > Secrets and variables > Actions)"; exit 1; fi
-          done
-
-      - name: Setup Node 22
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Check required files
-        run: |
-          echo "Repo kokundeki dosyalar:"
-          ls -la
-          missing=0
-          for f in package.json index.html icon-only.png splash.png; do
-            if [ ! -f "$f" ]; then echo "::error::$f repo kokunde bulunamadi"; missing=1; fi
-          done
-          for f in manifest.json icon-foreground.png icon-background.png splash-dark.png; do
-            if [ ! -f "$f" ]; then echo "::warning::$f bulunamadi (opsiyonel, atlaniyor)"; fi
-          done
-          if [ "$missing" = 1 ]; then exit 1; fi
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Prepare www and assets folders
-        run: |
-          mkdir -p www assets
-          cp index.html www/
-          for f in manifest.json; do [ -f "$f" ] && cp "$f" www/ || true; done
-          for f in icon-only.png icon-foreground.png icon-background.png splash.png splash-dark.png; do
-            [ -f "$f" ] && cp "$f" assets/ || true
-          done
-          ls -la www assets
-
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Configure AndroidManifest (AdMob App ID + portrait)
-        run: |
-          python3 - <<'PY'
-          import os
-          p = 'android/app/src/main/AndroidManifest.xml'
-          s = open(p, encoding='utf-8').read()
-          assert 'com.google.android.gms.ads.APPLICATION_ID' not in s
-          meta = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="%s"/>' % os.environ['ADMOB_APP_ID']
-          assert '</application>' in s and '<activity ' in s
-          s = s.replace('</application>', '    ' + meta + '\n    </application>', 1)
-          s = s.replace('<activity ', '<activity android:screenOrientation="portrait" ', 1)
-          open(p, 'w', encoding='utf-8').write(s)
-          PY
-          cat android/app/src/main/AndroidManifest.xml
-
-      - name: Generate icons and splash screens
-        run: npx capacitor-assets generate --android
-
-      - name: Sync web files
-        run: npx cap sync android
-
-      - name: Check target SDK is 36
-        run: |
-          if [ ! -f android/variables.gradle ]; then echo "::error::android/variables.gradle bulunamadi"; ls -la android; exit 1; fi
-          grep -n "SdkVersion" android/variables.gradle
-          grep -Eq "targetSdkVersion *=? *36" android/variables.gradle || { echo "::error::targetSdkVersion 36 degil, Google Play kabul etmez"; exit 1; }
-
-      - name: Set version code
-        run: |
-          sed -E -i "s/versionCode[ =]+[0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
-          grep -n "versionCode" android/app/build.gradle
-          grep -q "versionCode ${{ github.run_number }}" android/app/build.gradle || { echo "::error::versionCode guncellenemedi"; exit 1; }
-
-      - name: Setup Gradle (cache)
-        uses: gradle/actions/setup-gradle@v5
-
-      - name: Build release AAB
-        working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew bundleRelease --no-daemon
-
-      - name: Sign AAB
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > release.jks
-          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 \
-            -keystore release.jks \
-            -storepass "$KEYSTORE_PASSWORD" \
-            -keypass "$KEY_PASSWORD" \
-            android/app/build/outputs/bundle/release/app-release.aab \
-            "$KEY_ALIAS"
-          jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
-          rm release.jks
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v5
-        with:
-          name: critter-escape-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
-          retention-days: 30
+{
+  "name": "critter-escape",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Critter Escape - Aksu Studio",
+  "scripts": {
+    "assets": "capacitor-assets generate --android",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^8.2.0",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/splash-screen": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0"
+  }
+}
