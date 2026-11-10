@@ -77,9 +77,12 @@ jobs:
           s = open(p, encoding='utf-8').read()
           assert 'com.google.android.gms.ads.APPLICATION_ID' not in s
           meta = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="%s"/>' % os.environ['ADMOB_APP_ID']
-          assert '</application>' in s and '<activity ' in s
+          import re
+          assert '</application>' in s, 'application kapanis etiketi yok'
+          assert re.search(r'<activity(?=\s)', s), 'activity etiketi yok'
           s = s.replace('</application>', '    ' + meta + '\n    </application>', 1)
-          s = s.replace('<activity ', '<activity android:screenOrientation="portrait" ', 1)
+          if 'android:screenOrientation' not in s:
+              s = re.sub(r'<activity(?=\s)', '<activity android:screenOrientation="portrait"', s, count=1)
           open(p, 'w', encoding='utf-8').write(s)
           PY
           cat android/app/src/main/AndroidManifest.xml
